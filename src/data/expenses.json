@@ -1,0 +1,10 @@
+[
+  {
+    "id": 1,
+    "title": "Supermercado",
+    "amount": 150.5,
+    "category": "Alimentação",
+    "date": "2026-03-10",
+    "description": "Compra semanal"
+  }
+]
