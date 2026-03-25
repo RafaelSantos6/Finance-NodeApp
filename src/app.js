@@ -4,73 +4,60 @@ const Expense = require('./models/expense');
 const app = express();
 app.use(express.json());
 
-// 1. Listar todas as despesas (com filtros opcionais)
+// 1. Listar
 app.get('/expenses', (req, res) => {
-    let list = Expense.findAll();
-    const { category, date } = req.query;
-
-    if (category) list = list.filter(e => e.category === category);
-    if (date) list = list.filter(e => e.date === date);
-
-    res.json(list);
+    let lista = Expense.findAll();
+    if (req.query.category) {
+        lista = lista.filter(e => e.category === req.query.category);
+    }
+    res.json(lista);
 });
 
-// 2. Buscar despesa por ID (importante: tratar como número)
+// 2. Buscar por ID
 app.get('/expenses/:id', (req, res) => {
-    const id = Number(req.params.id); 
-    const expense = Expense.findById(id);
-    
-    if (!expense) return res.status(404).json({ error: "Expense not found" });
-    res.json(expense);
+    const despesa = Expense.findById(req.params.id);
+    if (!despesa) return res.status(404).json({ error: "Expense not found" });
+    res.json(despesa);
 });
 
-// 3. Criar nova despesa (com validações)
+// 3. Criar (com Regras de Negócio)
 app.post('/expenses', (req, res) => {
     const { title, amount, date } = req.body;
 
-    // Regras de Negócio
-    if (!title) return res.status(400).json({ error: "O campo title é obrigatório" });
-    if (amount <= 0) return res.status(400).json({ error: "O campo amount deve ser maior que zero" });
+    if (!title) return res.status(400).json({ error: "O título é obrigatório" });
+    if (amount <= 0) return res.status(400).json({ error: "O valor deve ser maior que zero" });
+    if (new Date(date) > new Date()) return res.status(400).json({ error: "A data não pode ser futura" });
 
-    const newExpense = Expense.create(req.body);
-    res.status(201).json(newExpense);
+    const nova = Expense.create(req.body);
+    res.status(201).json(nova);
 });
 
-// 4. Atualizar despesa
+// 4. Atualizar
 app.put('/expenses/:id', (req, res) => {
-    const id = Number(req.params.id);
-    const updated = Expense.update(id, req.body);
-    
-    if (!updated) return res.status(404).json({ error: "Expense not found" });
-    res.json(updated);
+    const atualizada = Expense.update(req.params.id, req.body);
+    if (!atualizada) return res.status(404).json({ error: "Expense not found" });
+    res.json(atualizada);
 });
 
-// 5. Remover despesa
+// 5. Remover
 app.delete('/expenses/:id', (req, res) => {
-    const id = Number(req.params.id);
-    const success = Expense.delete(id);
-    
-    if (!success) return res.status(404).json({ error: "Expense not found" });
-    res.status(204).send();
+    if (Expense.delete(req.params.id)) return res.status(204).send();
+    res.status(404).json({ error: "Expense not found" });
 });
 
-// 6. Resumo Total
+// 6. Extra: Total Geral
 app.get('/expenses/summary/total', (req, res) => {
-    const total = Expense.findAll().reduce((sum, e) => sum + e.amount, 0);
-    res.json({ total: Number(total.toFixed(2)) });
+    const total = Expense.findAll().reduce((soma, e) => soma + e.amount, 0);
+    res.json({ total });
 });
 
-// 7. Resumo por Categoria (Teste)
+// 7. Extra: Total por Categoria
 app.get('/expenses/summary/category', (req, res) => {
-    const summary = Expense.findAll().reduce((acc, e) => {
+    const resumo = Expense.findAll().reduce((acc, e) => {
         acc[e.category] = (acc[e.category] || 0) + e.amount;
         return acc;
     }, {});
-    res.json(summary);
+    res.json(resumo);
 });
 
-// Iniciar o servidor
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Servidor rodando em: http://localhost:${PORT}`);
-});
+app.listen(3000, () => console.log("Servidor em http://localhost:3000"));

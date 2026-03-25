@@ -1,63 +1,59 @@
 const fs = require('fs');
-const path = require('path');
-
-const filePath = path.join(__dirname, '..', 'data', 'expenses.json');
-
-const readData = () => {
-    const data = fs.readFileSync(filePath, 'utf-8');
-    return JSON.parse(data);
-};
-
-const writeData = (data) => {
-    fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-};
 
 const Expense = {
-    findAll: () => readData(),
-    
-    findById: (id) => {
-        const expenses = readData();
-        // Convertemos o id para número para garantir a comparação correta
-        return expenses.find(e => e.id === Number(id));
+    // LISTAR (GET /expenses)
+    findAll: () => {
+        const dados = fs.readFileSync('./src/data/expenses.json');
+        return JSON.parse(dados);
     },
 
-    create: (data) => {
-        const expenses = readData();
-        
-        // Lógica para ID sequencial: pega o ID do último item e soma 1
-        const lastId = expenses.length > 0 ? expenses[expenses.length - 1].id : 0;
-        const newId = lastId + 1;
+    // BUSCAR POR ID (GET /expenses/:id)
+    findById: (id) => {
+        const lista = JSON.parse(fs.readFileSync('./src/data/expenses.json'));
+        return lista.find(e => e.id === Number(id));
+    },
 
-        const newExpense = {
-            id: newId,
-            title: data.title,
-            amount: data.amount,
-            category: data.category,
-            date: data.date,
-            description: data.description || ""
+    // CRIAR (POST /expenses)
+    create: (dados) => {
+        const lista = JSON.parse(fs.readFileSync('./src/data/expenses.json'));
+        const novoId = lista.length > 0 ? lista[lista.length - 1].id + 1 : 1;
+
+        const novaDespesa = {
+            id: novoId,
+            title: dados.title,
+            amount: dados.amount,
+            category: dados.category,
+            date: dados.date,
+            description: dados.description || ""
         };
 
-        expenses.push(newExpense);
-        writeData(expenses);
-        return newExpense;
+        lista.push(novaDespesa);
+        fs.writeFileSync('./src/data/expenses.json', JSON.stringify(lista, null, 2));
+        return novaDespesa;
     },
 
-    update: (id, data) => {
-        const expenses = readData();
-        const index = expenses.findIndex(e => e.id === Number(id));
+    // ATUALIZAR (PUT /expenses/:id)
+    update: (id, dadosNovos) => {
+        const lista = JSON.parse(fs.readFileSync('./src/data/expenses.json'));
+        const index = lista.findIndex(e => e.id === Number(id));
+        
         if (index === -1) return null;
 
-        // Atualiza mantendo o ID original
-        expenses[index] = { ...expenses[index], ...data, id: Number(id) };
-        writeData(expenses);
-        return expenses[index];
+        // Atualiza os campos mantendo o ID original
+        lista[index] = { ...lista[index], ...dadosNovos, id: Number(id) };
+        
+        fs.writeFileSync('./src/data/expenses.json', JSON.stringify(lista, null, 2));
+        return lista[index];
     },
 
+    // REMOVER (DELETE /expenses/:id)
     delete: (id) => {
-        const expenses = readData();
-        const filtered = expenses.filter(e => e.id !== Number(id));
-        if (expenses.length === filtered.length) return false;
-        writeData(filtered);
+        const lista = JSON.parse(fs.readFileSync('./src/data/expenses.json'));
+        const filtrados = lista.filter(e => e.id !== Number(id));
+
+        if (lista.length === filtrados.length) return false;
+
+        fs.writeFileSync('./src/data/expenses.json', JSON.stringify(filtrados, null, 2));
         return true;
     }
 };
