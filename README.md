@@ -1,5 +1,5 @@
 # Personal Expenses API
-
+Readme formatado no gemini
 ## Como Executar
 1. Instalar dependências: `npm install`
 2. Iniciar servidor: `node src/app.js`
