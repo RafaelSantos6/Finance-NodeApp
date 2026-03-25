@@ -35,7 +35,6 @@ const Expense = {
             category: data.category,
             date: data.date,
             description: data.description || ""
-            // createdAt removido conforme solicitado
         };
 
         expenses.push(newExpense);
