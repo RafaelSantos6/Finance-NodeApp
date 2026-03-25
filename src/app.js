@@ -17,7 +17,7 @@ app.get('/expenses', (req, res) => {
 
 // 2. Buscar despesa por ID (importante: tratar como número)
 app.get('/expenses/:id', (req, res) => {
-    const id = Number(req.params.id); // Converte a string da URL para número
+    const id = Number(req.params.id); 
     const expense = Expense.findById(id);
     
     if (!expense) return res.status(404).json({ error: "Expense not found" });
@@ -31,11 +31,6 @@ app.post('/expenses', (req, res) => {
     // Regras de Negócio
     if (!title) return res.status(400).json({ error: "O campo title é obrigatório" });
     if (amount <= 0) return res.status(400).json({ error: "O campo amount deve ser maior que zero" });
-    
-    // Validação de data (não pode ser no futuro)
-    if (new Date(date) > new Date()) {
-        return res.status(400).json({ error: "O campo date não pode ser no futuro" });
-    }
 
     const newExpense = Expense.create(req.body);
     res.status(201).json(newExpense);
@@ -56,7 +51,7 @@ app.delete('/expenses/:id', (req, res) => {
     const success = Expense.delete(id);
     
     if (!success) return res.status(404).json({ error: "Expense not found" });
-    res.status(204).send(); // Sucesso sem conteúdo
+    res.status(204).send();
 });
 
 // 6. Resumo Total
@@ -65,7 +60,7 @@ app.get('/expenses/summary/total', (req, res) => {
     res.json({ total: Number(total.toFixed(2)) });
 });
 
-// 7. Resumo por Categoria
+// 7. Resumo por Categoria (Teste)
 app.get('/expenses/summary/category', (req, res) => {
     const summary = Expense.findAll().reduce((acc, e) => {
         acc[e.category] = (acc[e.category] || 0) + e.amount;
