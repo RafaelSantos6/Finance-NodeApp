@@ -4,6 +4,8 @@ const Expense = require('./models/expense');
 const app = express();
 app.use(express.json());
 
+//Removido coisas não aprendidas em aula.
+
 // 1. Listar
 app.get('/expenses', (req, res) => {
     let lista = Expense.findAll();
