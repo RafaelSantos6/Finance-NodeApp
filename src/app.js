@@ -20,10 +20,9 @@ app.get('/expenses/:id', (req, res) => {
     res.json(despesa);
 });
 
-// 3. Criar (com Regras de Negócio)
+// 3. Criar
 app.post('/expenses', (req, res) => {
     const { title, amount, date } = req.body;
-
     if (!title) return res.status(400).json({ error: "O título é obrigatório" });
     if (amount <= 0) return res.status(400).json({ error: "O valor deve ser maior que zero" });
     if (new Date(date) > new Date()) return res.status(400).json({ error: "A data não pode ser futura" });
@@ -45,9 +44,11 @@ app.delete('/expenses/:id', (req, res) => {
     res.status(404).json({ error: "Expense not found" });
 });
 
-// 6. Extra: Total Geral
+// 6. Extra: Total Geral 
 app.get('/expenses/summary/total', (req, res) => {
-    const total = Expense.findAll().reduce((soma, e) => soma + e.amount, 0);
+    const total = Expense.findAll().reduce((soma, e) => {
+        return soma + e.amount;
+    }); // O erro é a falta do zero aqui antes de fechar o parênteses
     res.json({ total });
 });
 
@@ -55,8 +56,7 @@ app.get('/expenses/summary/total', (req, res) => {
 app.get('/expenses/summary/category', (req, res) => {
     const resumo = Expense.findAll().reduce((acc, e) => {
         acc[e.category] = (acc[e.category] || 0) + e.amount;
-        return acc;
-    }, {});
+    }, {}); 
     res.json(resumo);
 });
 
