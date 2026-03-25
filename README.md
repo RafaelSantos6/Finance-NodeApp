@@ -1,7 +1,5 @@
 # Personal Expenses API
 
-API para gerenciamento de despesas pessoais desenvolvida em Node.js com Express.
-
 ## Como Executar
 1. Instalar dependências: `npm install`
 2. Iniciar servidor: `node src/app.js`
