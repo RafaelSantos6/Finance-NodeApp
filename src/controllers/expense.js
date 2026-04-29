@@ -28,7 +28,7 @@ class ExpenseController {
      atualizar = (req, res) => {
         const atualizada = Expense.update(req.params.id, req.body);
         if (!atualizada) return res.status(404).json({ error: "Expense not found" });
-        res.json(atualizada);
+        res.json();
     };
 
         remover = (req, res) => {

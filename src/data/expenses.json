@@ -1,1 +1,10 @@
-[]
+[
+  {
+    "id": 1,
+    "title": "Ovo",
+    "custo": "5",
+    "category": "Comida",
+    "date": "2024-03-20",
+    "description": "Pastel de chocolate"
+  }
+]
