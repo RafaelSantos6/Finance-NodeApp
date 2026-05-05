@@ -17,11 +17,11 @@ const ExpenseModel = {
 
         const novaDespesa = {
             id:Number(novoId),
-            title: dados.title,
+            titulo: dados.titulo,
             custo: dados.custo,
-            category: dados.category,
-            date: dados.date,
-            description: dados.description || ""
+            categoria: dados.categoria,
+            data: dados.data,
+            descricao: dados.descricao || ""
         };
 
         lista.push(novaDespesa);

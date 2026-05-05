@@ -1,10 +1,18 @@
 [
   {
     "id": 1,
-    "title": "Ovo",
+    "titulo": "Ovo",
     "custo": "5",
-    "category": "Comida",
-    "date": "2024-03-20",
-    "description": "Pastel de chocolate"
+    "categoria": "Comida",
+    "data": "2024-03-20",
+    "descricao": "Pastel de chocolate"
+  },
+  {
+    "id": 2,
+    "titulo": "Pão",
+    "custo": "10",
+    "categoria": "Comida",
+    "data": "2024-03-20",
+    "descricao": "Pãozin"
   }
 ]

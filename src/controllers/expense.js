@@ -3,8 +3,8 @@ const Expense = require('../model/expense');
 class ExpenseController {
    listar = (req, res) => {
         let lista = Expense.findAll();
-        if (req.query.category) {
-            lista = lista.filter(e => e.category === req.query.category);
+        if (req.query.categoria) {
+            lista = lista.filter(e => e.categoria === req.query.categoria);
         }
         res.json(lista);
     };
@@ -16,10 +16,10 @@ class ExpenseController {
     };
 
     criar = (req, res) => {
-        const { title, custo, date } = req.body;
-        if (!title) return res.status(400).json({ error: "O título é obrigatório" });
+        const { titulo, custo, data } = req.body;
+        if (!titulo) return res.status(400).json({ error: "O título é obrigatório" });
         if (custo <= 0) return res.status(400).json({ error: "O valor deve ser maior que zero" });
-        if (new Date(date) > new Date()) return res.status(400).json({ error: "A data não pode ser futura" });
+        if (new Date(data) > new Date()) return res.status(400).json({ error: "A data não pode ser futura" });
 
         const nova = Expense.create(req.body);
         res.status(201).json(nova);
