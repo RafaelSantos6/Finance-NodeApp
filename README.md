@@ -2,7 +2,7 @@
 Readme formatado no gemini
 ## Como Executar
 1. Instalar dependências: `npm install`
-2. Iniciar servidor: `node src/app.js`
+2. Iniciar servidor: `node src/server/server.js`
 3. Aceder em: `http://localhost:3000`
 
 ## Rotas Principal
