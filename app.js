@@ -1,6 +1,8 @@
 const express = require('express');
 const expenseRoutes = require('./src/routes/routes.js');
 const sequelize = require('./src/data/database.js');
+const Expense = require('./src/model/expense.js');
+
 
 sequelize.sync()
 .then(() => {

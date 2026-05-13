@@ -1,4 +1,4 @@
-const sequelize = require('sequelize');
+const { Sequelize } = require('sequelize');
 
 const sequilize = new Sequelize (
     'finace_db',

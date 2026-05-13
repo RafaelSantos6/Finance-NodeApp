@@ -1,39 +1,54 @@
 const Expense = require('../model/expense');
 
 class ExpenseController {
-   listar = (req, res) => {
-        let lista = Expense.findAll();
-        if (req.query.categoria) {
-            lista = lista.filter(e => e.categoria === req.query.categoria);
-        }
-        res.json(lista);
-    };
+  listar = async (req,res) => {
+    try {
+        const despesas = await Expense.findAll();
+        res.json(despesas);
+    } catch (error) {
+        res.status(500).json({ error: "Error to find expenses" });
+    }
+};
 
-    buscarPorId = (req, res) => {
-        const despesa = Expense.findById(req.params.id);
+    buscarPorId = async (req, res) => {
+        try {
+        const despesa = await Expense.findByPk(req.params.id);
         if (!despesa) return res.status(404).json({ error: "Expense not found" });
         res.json(despesa);
-    };
+    } catch (error) {
+        res.status(500).json({ error: "Error to find expense" });
+    }
+};
 
-    criar = (req, res) => {
+    criar = async (req, res) => {
+    try {
         const { titulo, custo, data } = req.body;
-        if (!titulo) return res.status(400).json({ error: "O título é obrigatório" });
-        if (custo <= 0) return res.status(400).json({ error: "O valor deve ser maior que zero" });
-        if (new Date(data) > new Date()) return res.status(400).json({ error: "A data não pode ser futura" });
 
-        const nova = Expense.create(req.body);
+        const nova = await Expense.create(req.body); 
         res.status(201).json(nova);
-    };
+    } catch (error) {
+        res.status(500).json({ error: "Error to create expense" });
+    }
+};
 
-     atualizar = (req, res) => {
-        const atualizada = Expense.update(req.params.id, req.body);
-        if (!atualizada) return res.status(404).json({ error: "Expense not found" });
-        res.json(atualizada);
-    };
+     atualizar = async (req, res) => {
+        try {
+        const atualizada = await Expense.update(req.body, { where: { id: req.params.id } });
+        if (!atualizada[0]) return res.status(404).json({ error: "Expense not found" });
+        res.json({ message: "Expense updated successfully" });
+    } catch (error) {
+        res.status(500).json({ error: "Error to update expense" });
+    }
+};
 
-        remover = (req, res) => {
-            if (Expense.delete(req.params.id)) return res.status(204).send();
-            res.status(404).json({ error: "Expense not found" });
+        remover = async (req, res) => {
+            try {
+                const deletada = await Expense.destroy({ where: { id: req.params.id } });
+                if (!deletada) return res.status(404).json({ error: "Expense not found" });
+                res.status(204).send();
+            } catch (error) {
+                res.status(500).json({ error: "Error to delete expense" });
+            }
         };
         
 
