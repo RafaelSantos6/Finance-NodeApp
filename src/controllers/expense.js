@@ -1,4 +1,4 @@
-const Expense = require('../model/expense');
+const Expense = require('../models/expense');
 
 class ExpenseController {
    listar = (req, res) => {
