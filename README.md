@@ -13,3 +13,8 @@ Readme formatado no gemini
 | GET | /expenses/:id | Busca despesa por ID |
 | PUT | /expenses/:id | Atualiza uma despesa |
 | DELETE | /expenses/:id | Remove uma despesa |
+
+## comandos do banco
+1. npx sequelize-cli db:create
+2. npx sequelize-cli db:migrate
+3. npx sequelize-cli db:seed:all
