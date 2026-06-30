@@ -12,7 +12,6 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-<<<<<<< HEAD
     "bcrypt": "^6.0.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
@@ -21,11 +20,9 @@
     "sequelize": "^6.37.8"
   },
   "devDependencies": {
-    "sequelize-cli": "^6.6.5"
-=======
     "express": "^5.2.1",
     "mysql2": "^3.22.3",
-    "sequelize": "^6.37.8"
->>>>>>> 7a927f12f1c095a1765dcfaaa44f41955c789d2f
+    "sequelize": "^6.37.8",
+    "sequelize-cli": "^6.6.5"
   }
 }
