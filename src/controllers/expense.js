@@ -1,19 +1,20 @@
-const { Expense } = require('../models');
+const { Expense, Category } = require('../models');
 const { Op } = require('sequelize');
 
 class ExpenseController {
 
     listar = async (req, res) => {
         try {
-            const { status, categoria, dataInicio, dataFim, valorMin, valorMax } = req.query;
+            const { status, categoria, dataInicio, dataFim, custoMin, custoMax } = req.query;
             const whereClause = { usuarioId: req.userId };
+            res.json(despesas);
             if (status) whereClause.status = status;
             if (categoria) whereClause.categoriaId = categoria;
 
-            if (valorMin || valorMax) {
-                whereClause.valor = {};
-                if (valorMin) whereClause.valor[Op.gte] = valorMin;
-                if (valorMax) whereClause.valor[Op.lte] = valorMax;
+            if (custoMin || custoMax) {
+                whereClause.custo = {};
+                if (custoMin) whereClause.custo[Op.gte] = custoMin;
+                if (custoMax) whereClause.custo[Op.lte] = custoMax;
             }
 
             if (dataInicio || dataFim) {
@@ -31,44 +32,94 @@ class ExpenseController {
 
     buscarPorId = async (req, res) => {
         try {
-            const despesa = await Expense.findByPk(req.params.id);
-            if (!despesa) return res.status(404).json({ error: "Expense not found" });
+            const despesa = await Expense.findOne({
+                where: {
+                    id: req.params.id,
+                    usuarioId: req.userId
+                }
+            });
+
+            if (!despesa) {
+                return res.status(404).json({ error: "Despesa não encontrada" });
+            }
             res.json(despesa);
         } catch (error) {
-            res.status(500).json({ error: "Error to find expense" });
+            res.status(500).json({ error: "Erro ao buscar despesa" });
         }
     };
-
     criar = async (req, res) => {
         try {
-            // Atribui o ID extraído do token JWT
-            const nova = await Expense.create({ ...req.body, usuarioId: req.userId });
-            res.status(201).json(nova);
+            const {
+                descricao,
+                custo,
+                data,
+                status,
+                categoriaId
+            } = req.body;
+
+            const categoria = await Category.findByPk(categoriaId);
+
+            if (!categoria) {
+                return res.status(404).json({
+                    error: "Categoria não encontrada"
+                });
+            }
+
+            const despesa = await Expense.create({
+                descricao,
+                custo,
+                data,
+                status,
+                categoriaId,
+                usuarioId: req.userId
+            });
+
+            return res.status(201).json(despesa);
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao criar despesa" });
+            console.error(error);
+
+            return res.status(500).json({
+                error: error.message
+            });
         }
     };
 
     atualizar = async (req, res) => {
         try {
-            const atualizada = await Expense.update(req.body, { where: { id: req.params.id } });
-            if (!atualizada[0]) return res.status(404).json({ error: "Expense not found" });
-            res.json({ message: "Expense updated successfully" });
+            const [atualizado] = await Expense.update(req.body, {
+                where: {
+                    id: req.params.id,
+                    usuarioId: req.userId
+                }
+            });
+
+            if (atualizado === 0) {
+                return res.status(404).json({ error: "Despesa não encontrada ou não pertence ao usuário" });
+            }
+            res.json({ message: "Despesa atualizada com sucesso!" });
         } catch (error) {
-            res.status(500).json({ error: "Error to update expense" });
+            res.status(500).json({ error: "Erro ao atualizar despesa" });
         }
     };
 
     remover = async (req, res) => {
         try {
-            const deletada = await Expense.destroy({ where: { id: req.params.id } });
-            if (!deletada) return res.status(404).json({ error: "Expense not found" });
-            res.status(204).send();
+            const deletado = await Expense.destroy({
+                where: {
+                    id: req.params.id,
+                    usuarioId: req.userId
+                }
+            });
+
+            if (!deletado) {
+                return res.status(404).json({ error: "Despesa não encontrada ou não pertence ao usuário" });
+            }
+            res.json({ message: "Despesa removida com sucesso!" });
         } catch (error) {
-            res.status(500).json({ error: "Error to delete expense" });
+            res.status(500).json({ error: "Erro ao remover despesa" });
         }
     };
-
 
 }
 

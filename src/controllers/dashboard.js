@@ -3,7 +3,7 @@ const { Expense, Category, sequelize } = require('../models');
 class DashboardController {
     totalGastos = async (req, res) => {
         try {
-            const total = await Expense.sum('valor', { where: { usuarioId: req.userId } });
+            const total = await Expense.sum('custo', { where: { usuarioId: req.userId } });
             res.json({ total: total || 0 });
         } catch (error) {
             res.status(500).json({ error: 'Erro ao calcular total' });
@@ -25,7 +25,7 @@ class DashboardController {
                 where: { usuarioId: req.userId },
                 attributes: [
                     [sequelize.col('categoria.nome'), 'categoria'],
-                    [sequelize.fn('SUM', sequelize.col('valor')), 'total']
+                    [sequelize.fn('SUM', sequelize.col('custo')), 'total']
                 ],
                 include: [{
                     model: Category,
