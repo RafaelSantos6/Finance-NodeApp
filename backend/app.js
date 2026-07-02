@@ -10,6 +10,8 @@ const dashboardRoutes = require('./src/routes/dashboard.js');
 const authMiddleware = require('./src/middlewares/auth.js');
 const categoryRoutes = require('./src/routes/category.js');
 
+const cors = require('cors');
+
 // Swagger
 const swaggerOptions = {
     swaggerDefinition: {
@@ -47,7 +49,9 @@ sequelize.sync()
 .catch((err) => console.error("Erro ao conectar ao banco de dados:", err));
 
 const app = express();
+app.use(cors());
 app.use(express.json());
+
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

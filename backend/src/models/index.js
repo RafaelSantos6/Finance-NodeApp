@@ -29,10 +29,12 @@ fs
       Sequelize.DataTypes
     );
 
-    console.log(file, model);
 
     db[model?.name] = model;
   });
+
+  
+
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {

@@ -5,50 +5,105 @@ class ExpenseController {
 
     listar = async (req, res) => {
         try {
-            const { status, categoria, dataInicio, dataFim, custoMin, custoMax } = req.query;
-            const whereClause = { usuarioId: req.userId };
-            res.json(despesas);
-            if (status) whereClause.status = status;
-            if (categoria) whereClause.categoriaId = categoria;
+            const {
+                status,
+                categoria,
+                dataInicio,
+                dataFim,
+                valorMin,
+                valorMax
+            } = req.query;
 
-            if (custoMin || custoMax) {
-                whereClause.custo = {};
-                if (custoMin) whereClause.custo[Op.gte] = custoMin;
-                if (custoMax) whereClause.custo[Op.lte] = custoMax;
+            const whereClause = {
+                usuarioId: req.userId
+            };
+
+            if (status)
+                whereClause.status = status;
+
+            if (categoria)
+                whereClause.categoriaId = categoria;
+
+            // filtro por valor
+            if (valorMin || valorMax) {
+                whereClause.valor = {};
+
+                if (valorMin)
+                    whereClause.valor[Op.gte] = valorMin;
+
+                if (valorMax)
+                    whereClause.valor[Op.lte] = valorMax;
             }
 
+            // filtro por período
             if (dataInicio || dataFim) {
                 whereClause.data = {};
-                if (dataInicio) whereClause.data[Op.gte] = dataInicio;
-                if (dataFim) whereClause.data[Op.lte] = dataFim;
+
+                if (dataInicio)
+                    whereClause.data[Op.gte] = dataInicio;
+
+                if (dataFim)
+                    whereClause.data[Op.lte] = dataFim;
             }
 
-            const despesas = await Expense.findAll({ where: whereClause });
-            res.json(despesas);
+            const despesas = await Expense.findAll({
+                where: whereClause,
+                include: [
+                    {
+                        model: Category,
+                        as: 'categoria'
+                    }
+                ]
+            });
+
+            return res.json(despesas);
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar despesas" });
+            console.error(error);
+
+            return res.status(500).json({
+                error: 'Erro ao buscar despesas'
+            });
         }
     };
 
     buscarPorId = async (req, res) => {
         try {
+
             const despesa = await Expense.findOne({
                 where: {
                     id: req.params.id,
                     usuarioId: req.userId
-                }
+                },
+                include: [
+                    {
+                        model: Category,
+                        as: 'categoria'
+                    }
+                ]
             });
 
             if (!despesa) {
-                return res.status(404).json({ error: "Despesa não encontrada" });
+                return res.status(404).json({
+                    error: 'Despesa não encontrada'
+                });
             }
-            res.json(despesa);
+
+            return res.json(despesa);
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao buscar despesa" });
+            console.error(error);
+
+            return res.status(500).json({
+                error: 'Erro ao buscar despesa'
+            });
         }
     };
+
     criar = async (req, res) => {
         try {
+            
+
             const {
                 descricao,
                 valor,
@@ -61,11 +116,11 @@ class ExpenseController {
 
             if (!categoria) {
                 return res.status(404).json({
-                    error: "Categoria não encontrada"
+                    error: 'Categoria não encontrada'
                 });
             }
 
-            await Expense.create({
+            const despesa = await Expense.create({
                 descricao,
                 valor,
                 data,
@@ -87,41 +142,66 @@ class ExpenseController {
 
     atualizar = async (req, res) => {
         try {
-            const [atualizado] = await Expense.update(req.body, {
+
+            const despesa = await Expense.findOne({
                 where: {
                     id: req.params.id,
                     usuarioId: req.userId
                 }
             });
 
-            if (atualizado === 0) {
-                return res.status(404).json({ error: "Despesa não encontrada ou não pertence ao usuário" });
+            if (!despesa) {
+                return res.status(404).json({
+                    error: 'Despesa não encontrada'
+                });
             }
-            res.json({ message: "Despesa atualizada com sucesso!" });
+
+            await despesa.update(req.body);
+
+            return res.json({
+                message: 'Despesa atualizada com sucesso',
+                despesa
+            });
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao atualizar despesa" });
+            console.error(error);
+
+            return res.status(500).json({
+                error: 'Erro ao atualizar despesa'
+            });
         }
     };
 
     remover = async (req, res) => {
         try {
-            const deletado = await Expense.destroy({
+
+            const despesa = await Expense.findOne({
                 where: {
                     id: req.params.id,
                     usuarioId: req.userId
                 }
             });
 
-            if (!deletado) {
-                return res.status(404).json({ error: "Despesa não encontrada ou não pertence ao usuário" });
+            if (!despesa) {
+                return res.status(404).json({
+                    error: 'Despesa não encontrada'
+                });
             }
-            res.json({ message: "Despesa removida com sucesso!" });
+
+            await despesa.destroy();
+
+            return res.json({
+                message: 'Despesa removida com sucesso'
+            });
+
         } catch (error) {
-            res.status(500).json({ error: "Erro ao remover despesa" });
+            console.error(error);
+
+            return res.status(500).json({
+                error: 'Erro ao remover despesa'
+            });
         }
     };
-
 }
-
 
 module.exports = new ExpenseController();
