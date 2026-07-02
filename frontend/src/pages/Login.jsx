@@ -1,28 +1,25 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import api from '../services/api';
+import { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
+import { AuthContext } from '../contexts/AuthContext';
 
 export default function Login() {
+  const { login } = useContext(AuthContext);
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
   const [erro, setErro] = useState('');
-  
-  const navigate = useNavigate();
+  const [loadingReq, setLoadingReq] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErro('');
+    setLoadingReq(true);
     try {
-      const response = await api.post('/auth/login', { email, senha });
-      
-      const { user, token } = response.data;
-
-      localStorage.setItem('@App:token', token);
-      localStorage.setItem('@App:user', JSON.stringify(user));
-
-      navigate('/dashboard');
+      await login(email, senha); 
     } catch (error) {
       setErro('Email ou senha incorretos.');
       console.error(error);
+    } finally {
+      setLoadingReq(false);
     }
   };
 
@@ -48,7 +45,7 @@ export default function Login() {
           onChange={(e) => setSenha(e.target.value)} 
           required 
         />
-        <button type="submit">Entrar</button>
+        <button type="submit" disabled={loadingReq}>{loadingReq ? 'Entrando...' : 'Entrar'}</button>
       </form>
       <p>Não tem conta? <Link to="/cadastro">Cadastre-se</Link></p>
     </div>

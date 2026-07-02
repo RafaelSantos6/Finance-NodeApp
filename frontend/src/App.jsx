@@ -1,38 +1,14 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
-import Login from './pages/Login';
-import Cadastro from './pages/Cadastro';
-import Dashboard from './pages/Dashboard';
+import { BrowserRouter } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import AppRoutes from './routes';
+import './styles/global.css'; // Mova seus CSS para a pasta correta
 
 export default function App() {
-
-    return (
-        <BrowserRouter>
-
-            <Routes>
-
-                <Route
-                    path="/"
-                    element={<Navigate to="/login" />}
-                />
-
-                <Route
-                    path="/login"
-                    element={<Login />}
-                />
-
-                <Route
-                    path="/cadastro"
-                    element={<Cadastro />}
-                />
-
-                <Route
-                    path="/dashboard"
-                    element={<Dashboard />}
-                />
-
-            </Routes>
-
-        </BrowserRouter>
-    );
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <AppRoutes />
+      </AuthProvider>
+    </BrowserRouter>
+  );
 }
