@@ -1,18 +1,25 @@
 import { useEffect, useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import api from "../services/api";
+import FiltrosDespesas from "../components/FiltrosDespesas"; 
+import { useNavigate } from "react-router-dom";
 
 export default function Dashboard() {
     const { logout, user } = useContext(AuthContext);
-    
-    // Estados do Dashboard
+    const navigate = useNavigate();
     const [despesas, setDespesas] = useState([]);
     const [total, setTotal] = useState(0);
     const [quantidade, setQuantidade] = useState(0);
     const [gastosCategoria, setGastosCategoria] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    // Estados para o CRUD de Despesas
+    const [filtros, setFiltros] = useState({
+        categoriaId: '',
+        status: '',
+        data: '',
+        valorMax: ''
+    });
+
     const [categorias, setCategorias] = useState([]);
     const [mostrarForm, setMostrarForm] = useState(false);
     const [formData, setFormData] = useState({
@@ -26,7 +33,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         carregarDashboard();
-        carregarCategorias(); // Precisamos das categorias para o Select do formulário
+        carregarCategorias();
     }, []);
 
     async function carregarDashboard() {
@@ -36,7 +43,7 @@ export default function Dashboard() {
                 api.get('/dashboard/total-expenses'),
                 api.get('/dashboard/expenses-count'),
                 api.get('/dashboard/expenses-by-category'),
-                api.get('/expenses') // Lista todas as despesas para a tabela
+                api.get('/expenses')
             ]);
 
             setTotal(resTotal.data.total);
@@ -61,7 +68,6 @@ export default function Dashboard() {
     }
 
     // --- FUNÇÕES DO CRUD ---
-
     const handleInputChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
@@ -87,16 +93,12 @@ export default function Dashboard() {
         e.preventDefault();
         try {
             if (formData.id) {
-                // Editar despesa existente
                 await api.put(`/expenses/${formData.id}`, formData);
-                alert("Despesa atualizada!");
             } else {
-                // Criar nova despesa
                 await api.post('/expenses', formData);
-                alert("Despesa criada com sucesso!");
             }
             setMostrarForm(false);
-            carregarDashboard(); // Atualiza a tabela e os cards de estatísticas
+            carregarDashboard();
         } catch (error) {
             console.error(error);
             alert("Erro ao salvar despesa.");
@@ -107,7 +109,7 @@ export default function Dashboard() {
         if (window.confirm("Tem certeza que deseja excluir esta despesa?")) {
             try {
                 await api.delete(`/expenses/${id}`);
-                carregarDashboard(); // Atualiza a tela
+                carregarDashboard();
             } catch (error) {
                 console.error(error);
                 alert("Erro ao excluir.");
@@ -115,22 +117,32 @@ export default function Dashboard() {
         }
     };
 
+    const despesasFiltradas = despesas.filter(despesa => {
+        const matchesCategoria = filtros.categoriaId ? String(despesa.categoriaId) === filtros.categoriaId : true;
+        const matchesStatus = filtros.status ? despesa.status === filtros.status : true;
+        const matchesData = filtros.data ? despesa.data === filtros.data : true;
+        const matchesValor = filtros.valorMax ? Number(despesa.valor) <= Number(filtros.valorMax) : true;
+
+        return matchesCategoria && matchesStatus && matchesData && matchesValor;
+    });
+
     if (loading) return <h2>Carregando dashboard...</h2>;
 
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-            {/* Header */}
             <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <div>
                     <h1>Dashboard Financeiro</h1>
                     <p>Olá, {user?.nome}!</p>
+                    <button 
+            onClick={() => navigate("/categorias")}
+        >Categorias</button>
                 </div>
                 <button onClick={logout} style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>
                     Sair
                 </button>
             </header>
 
-            {/* Cards de Resumo */}
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
                 <div style={{ padding: '20px', border: '1px solid #ccc', borderRadius: '8px', flex: 1, background: '#fff' }}>
                     <h3>Total Gasto</h3>
@@ -146,7 +158,8 @@ export default function Dashboard() {
                 </div>
             </div>
 
-            {/* Controle de Despesas */}
+            <FiltrosDespesas filtros={filtros} setFiltros={setFiltros} categorias={categorias} />
+
             <div style={{ background: '#fff', padding: '20px', border: '1px solid #ccc', borderRadius: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                     <h2>Minhas Despesas</h2>
@@ -155,7 +168,6 @@ export default function Dashboard() {
                     </button>
                 </div>
 
-                {/* Formulário Criar/Editar (Só aparece se mostrarForm for true) */}
                 {mostrarForm && (
                     <form onSubmit={salvarDespesa} style={{ display: 'flex', flexWrap: 'wrap', gap: '15px', background: '#f9f9f9', padding: '15px', borderRadius: '8px', marginBottom: '20px', border: '1px solid #ddd' }}>
                         <input type="text" name="descricao" placeholder="Descrição" value={formData.descricao} onChange={handleInputChange} required style={{ flex: '1 1 200px', padding: '8px' }} />
@@ -181,7 +193,6 @@ export default function Dashboard() {
                     </form>
                 )}
 
-                {/* Tabela de Despesas */}
                 <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                     <thead>
                         <tr style={{ background: '#f5f5f5' }}>
@@ -193,8 +204,8 @@ export default function Dashboard() {
                         </tr>
                     </thead>
                     <tbody>
-                        {despesas.length > 0 ? (
-                            despesas.map((despesa) => (
+                        {despesasFiltradas.length > 0 ? (
+                            despesasFiltradas.map((despesa) => (
                                 <tr key={despesa.id} style={{ borderBottom: '1px solid #eee' }}>
                                     <td style={{ padding: '12px' }}>{despesa.descricao}</td>
                                     <td style={{ padding: '12px', color: '#e74c3c', fontWeight: 'bold' }}>R$ {Number(despesa.valor).toFixed(2)}</td>
@@ -207,7 +218,7 @@ export default function Dashboard() {
                                 </tr>
                             ))
                         ) : (
-                            <tr><td colSpan="5" style={{ padding: '15px', textAlign: 'center' }}>Nenhuma despesa cadastrada.</td></tr>
+                            <tr><td colSpan="5" style={{ padding: '15px', textAlign: 'center' }}>Nenhuma despesa corresponde aos filtros aplicados.</td></tr>
                         )}
                     </tbody>
                 </table>

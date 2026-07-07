@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from '../pages/Login';
 import Cadastro from '../pages/Cadastro';
 import Dashboard from '../pages/Dashboard';
+import Categorias from '../pages/Categorias';
 import PrivateRoute from './PrivateRoute';
 
 export default function AppRoutes() {
@@ -11,7 +12,9 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
       
+      {/* Rotas Protegidas */}
       <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+      <Route path="/categorias" element={<PrivateRoute><Categorias /></PrivateRoute>} />
     </Routes>
   );
 }
