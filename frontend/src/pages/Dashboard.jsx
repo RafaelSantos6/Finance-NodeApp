@@ -95,12 +95,6 @@ export default function Dashboard() {
 
     return (
         <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-            <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-                <div>
-                    <h1>Dashboard Financeiro</h1>
-                    <p>Olá, {user?.nome}!</p>
-                </div>
-            </header>
 
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
                 <CardResumo title="Total Gasto" value={`R$ ${Number(total).toFixed(2)}`} color="#e74c3c" />
