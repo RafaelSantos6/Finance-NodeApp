@@ -1,7 +1,7 @@
 const { Sequelize } = require('sequelize');
 
-const sequilize = new Sequelize (
-    'finace_db',
+const sequelize = new Sequelize (
+    'finance_db',
     'root',
     '',
 {
@@ -10,4 +10,4 @@ const sequilize = new Sequelize (
 }
 );
 
-module.exports = sequilize;
+module.exports = sequelize;

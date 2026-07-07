@@ -10,11 +10,11 @@ class AuthController {
             const hashSenha = await bcrypt.hash(senha, 10);
             const user = await User.create({ nome, email, senha: hashSenha });
             
-            user.senha = undefined; // Remove a senha do retorno
+            user.senha = undefined; 
             res.status(201).json(user);
         } catch (error) {
             res.status(500).json({ error: 'Erro ao registrar usuário' });
-        }
+        } 
     };
 
     login = async (req, res) => {
