@@ -4,6 +4,7 @@ import Cadastro from '../pages/Cadastro';
 import Dashboard from '../pages/Dashboard';
 import Categorias from '../pages/Categorias';
 import PrivateRoute from './PrivateRoute';
+import LayoutPrivado from '../components/LayoutPrivado'; 
 
 export default function AppRoutes() {
   return (
@@ -12,9 +13,21 @@ export default function AppRoutes() {
       <Route path="/login" element={<Login />} />
       <Route path="/cadastro" element={<Cadastro />} />
       
-      {/* Rotas Protegidas */}
-      <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
-      <Route path="/categorias" element={<PrivateRoute><Categorias /></PrivateRoute>} />
+      <Route path="/dashboard" element={
+        <PrivateRoute>
+          <LayoutPrivado>
+            <Dashboard />
+          </LayoutPrivado>
+        </PrivateRoute>
+      } />
+      
+      <Route path="/categorias" element={
+        <PrivateRoute>
+          <LayoutPrivado>
+            <Categorias />
+          </LayoutPrivado>
+        </PrivateRoute>
+      } />
     </Routes>
   );
 }

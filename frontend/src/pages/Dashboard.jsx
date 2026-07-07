@@ -99,11 +99,7 @@ export default function Dashboard() {
                 <div>
                     <h1>Dashboard Financeiro</h1>
                     <p>Olá, {user?.nome}!</p>
-                    <button onClick={() => navigate("/categorias")} style={{ background: "#34495e", color: "#fff", border: "none", padding: "8px 15px", borderRadius: "5px", cursor: "pointer", marginTop: "5px", fontWeight: "bold" }}>
-                        ⚙️ Gerenciar Categorias
-                    </button>
                 </div>
-                <button onClick={logout} style={{ background: '#e74c3c', color: '#fff', border: 'none', padding: '10px 20px', borderRadius: '5px', cursor: 'pointer' }}>Sair</button>
             </header>
 
             <div style={{ display: 'flex', gap: '20px', marginBottom: '30px' }}>
