@@ -20,9 +20,9 @@ class CategoryController {
         }
     };
 
-    criar = async (req, res) => {
+    criar = async (req, res, transaction) => {
         try {
-            const nova = await Category.create(req.body);
+            const nova = await Category.create(req.body, {transaction});
             res.status(201).json(nova);
         } catch (error) {
             res.status(500).json({ error: "Erro ao criar categoria" });

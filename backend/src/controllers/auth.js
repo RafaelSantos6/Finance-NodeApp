@@ -3,18 +3,19 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
 class AuthController {
-    registrar = async (req, res) => {
+    registrar = async (req, res, transaction) => {
+
         try {
             const { nome, email, senha } = req.body;
-            
+
             const hashSenha = await bcrypt.hash(senha, 10);
-            const user = await User.create({ nome, email, senha: hashSenha });
-            
-            user.senha = undefined; 
+            const user = await User.create({ nome, email, senha: hashSenha }, {transaction});
+
+            user.senha = undefined;
             res.status(201).json(user);
         } catch (error) {
             res.status(500).json({ error: 'Erro ao registrar usuário' });
-        } 
+        }
     };
 
     login = async (req, res) => {
